@@ -1,9 +1,14 @@
 package ru.iprody;
 
+import ru.iprody.exception.BadRequestException;
+import ru.iprody.exception.HttpException;
+import ru.iprody.exception.NotFoundException;
+import ru.iprody.utils.StatusCode;
+import ru.iprody.utils.FileProcessor;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SimpleHttpServer {
@@ -15,50 +20,62 @@ public class SimpleHttpServer {
         while (true) {
             try (ServerSocket serverSocket = new ServerSocket(PORT)) {
                 System.out.println("Server started on http://localhost:8080");
-                getConnection(serverSocket);
+                establishConnection(serverSocket);
             }
         }
     }
 
-    private static void getConnection(ServerSocket serverSocket) throws IOException {
+    private static void establishConnection(ServerSocket serverSocket) throws IOException {
         try (Socket connection = serverSocket.accept()) {
-            String path = readRequest(connection);
-            writeResponse(connection, path);
+            try {
+                String path = exctractHttpPath(connection);
+                String content = readContent(path);
+                writeResponse(connection, StatusCode.OK, content);
+            } catch (HttpException e) {
+                writeResponse(connection, e.getStatusCode(), e.getContent());
+            }
         }
     }
 
-    private static String readRequest(Socket connection) throws IOException {
+    private static String exctractHttpPath(Socket connection) throws IOException, BadRequestException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
         String path = "";
 
-        while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) {
-            if (line.startsWith("GET")) {
-                String[] lineParts = line.split(" ");
-                if (lineParts.length > 2) {
-                    path = lineParts[1];
-                }
+        String line = bufferedReader.readLine();
+        if (line != null && line.startsWith("GET")) {
+            String[] lineParts = line.split(" ");
+            if (lineParts.length > 2) {
+                path = lineParts[1];
             }
-            System.out.println(line);
+            else {
+                throw new BadRequestException("Wrong HTTP start line");
+            }
         }
-        System.out.println();
 
         return path;
     }
 
-    private static void writeResponse(Socket connection, String path) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-
+    private static String readContent(String path) throws NotFoundException {
+        if ("/".equals(path)) {
+            return "<h1>Hello World!</h1>";
+        }
         String filePath = path.substring(1); // remove slash
         Path fullPath = Path.of(STATIC_DIR, filePath);
 
-        if (Files.exists(fullPath) && !Files.isDirectory(fullPath)) {
-            String content = Files.readString(fullPath);
-            writeContent(bufferedWriter, content, 200, "OK");
-        } else {
-            String notFoundContent = "<h1>404 Not Found</h1>";
-            writeContent(bufferedWriter, notFoundContent, 404, "Not Found");
+        try {
+            return FileProcessor.readFile(fullPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new NotFoundException(e.getMessage());
         }
+    }
+
+    private static void writeResponse(Socket connection,
+                                      StatusCode statusCode,
+                                      String content) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
+
+        writeContent(bufferedWriter, content, statusCode.getCode(), statusCode.getStatus());
 
         bufferedWriter.flush();
     }
