@@ -6,10 +6,15 @@ import ru.iprody.exception.NotFoundException;
 import ru.iprody.utils.StatusCode;
 import ru.iprody.utils.FileProcessor;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
+
+import static ru.iprody.utils.ContentType.DEFAULT;
 
 public class SimpleHttpServer {
 
@@ -28,36 +33,34 @@ public class SimpleHttpServer {
     private static void establishConnection(ServerSocket serverSocket) throws IOException {
         try (Socket connection = serverSocket.accept()) {
             try {
-                String path = exctractHttpPath(connection);
-                String content = readContent(path);
-                writeResponse(connection, StatusCode.OK, content);
+                String path = extractHttpPath(connection);
+                byte[] content = readContent(path);
+                String contentType = FileProcessor.getContentType(path);
+
+                writeResponse(connection, StatusCode.OK, contentType, content);
             } catch (HttpException e) {
-                writeResponse(connection, e.getStatusCode(), e.getContent());
+                writeResponse(connection, e.getStatusCode(), DEFAULT.getType(), e.getContent().getBytes());
             }
         }
     }
 
-    private static String exctractHttpPath(Socket connection) throws IOException, BadRequestException {
+    private static String extractHttpPath(Socket connection) throws IOException, BadRequestException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String path = "";
 
         String line = bufferedReader.readLine();
         if (line != null && line.startsWith("GET")) {
             String[] lineParts = line.split(" ");
             if (lineParts.length > 2) {
-                path = lineParts[1];
-            }
-            else {
-                throw new BadRequestException("Wrong HTTP start line");
+                return lineParts[1];
             }
         }
 
-        return path;
+        throw new BadRequestException("Wrong HTTP start line");
     }
 
-    private static String readContent(String path) throws NotFoundException {
+    private static byte[] readContent(String path) throws NotFoundException {
         if ("/".equals(path)) {
-            return "<h1>Hello World!</h1>";
+            return "<h1>Hello World!</h1>".getBytes();
         }
         String filePath = path.substring(1); // remove slash
         Path fullPath = Path.of(STATIC_DIR, filePath);
@@ -72,24 +75,26 @@ public class SimpleHttpServer {
 
     private static void writeResponse(Socket connection,
                                       StatusCode statusCode,
-                                      String content) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
+                                      String contentType,
+                                      byte[] content) throws IOException {
+        BufferedOutputStream output = new BufferedOutputStream(connection.getOutputStream());
 
-        writeContent(bufferedWriter, content, statusCode.getCode(), statusCode.getStatus());
+        writeContent(output, statusCode.getCode(), statusCode.getStatus(), contentType, content);
 
-        bufferedWriter.flush();
+        output.flush();
     }
 
-    private static void writeContent(BufferedWriter bufferedWriter,
-                                     String content,
+    private static void writeContent(BufferedOutputStream output,
                                      int code,
-                                     String status) throws IOException {
-        bufferedWriter.write("""
+                                     String status,
+                                     String contentType,
+                                     byte[] content) throws IOException {
+        output.write("""
                 HTTP/1.1 %d %s
-                Content-Type: text/html; charset=UTF-8
+                Content-Type: %s
                 Content-Length: %d
                 
-                %s
-                """.formatted(code, status, content.length(), content));
+                """.formatted(code, status, contentType, content.length).getBytes());
+        output.write(content);
     }
 }

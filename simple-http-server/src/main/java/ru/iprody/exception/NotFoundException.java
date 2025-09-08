@@ -1,10 +1,10 @@
 package ru.iprody.exception;
 
-import ru.iprody.utils.StatusCode;
+import static ru.iprody.utils.StatusCode.NOT_FOUND;
 
 public class NotFoundException extends HttpException {
 
     public NotFoundException(String message) {
-        super(message, StatusCode.NOT_FOUND, "<h1>404 Not Found</h1>");
+        super(message, NOT_FOUND, "<h1>%d %s</h1>".formatted(NOT_FOUND.getCode(), NOT_FOUND.getStatus()));
     }
 }
