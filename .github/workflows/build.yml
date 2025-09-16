@@ -17,5 +17,8 @@ jobs:
         with:
           java-version: '23'
           distribution: 'temurin'
+      - name: Check Code Style
+        working-directory: ./payment-service-app
+        run: mvn checkstyle:check
       - name: Build Project with Maven
         run: mvn clean install
