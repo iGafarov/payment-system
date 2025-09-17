@@ -1,0 +1,26 @@
+name: Build project for PR
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+      - name: Check Code Style
+        working-directory: ./payment-service-app
+        run: mvn checkstyle:check
+      - name: Build Project with Maven
+        run: mvn clean install
+      - name: Run Tests
+        run: mvn test
