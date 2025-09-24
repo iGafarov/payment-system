@@ -1,7 +1,16 @@
 package ru.iprody.persistence.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -26,16 +35,16 @@ public class Payment {
     private String currency;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private PaymentStatus status;
 
-    @Column(nullable = false, name = "inquiry_ref_id")
+    @Column(name = "inquiry_ref_id", nullable = false)
     private UUID inquiryRefId;
 
     @Column(name = "transaction_ref_id")
     private UUID transactionRefId;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "note", columnDefinition = "text")
     private String note;
 
     @Column(name = "created_at", nullable = false)
