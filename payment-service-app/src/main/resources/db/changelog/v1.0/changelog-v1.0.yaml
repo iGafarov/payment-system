@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: script/create-payment-table.yaml
+      relativeToChangeLogFile: true
+  - include:
+      file: data/sample-tx-data.yaml
+      relativeToChangeLogFile: true
