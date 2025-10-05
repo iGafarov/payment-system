@@ -44,7 +44,7 @@ public class PaymentController {
     public Page<Payment> searchPayments(
             @ModelAttribute PaymentFilterDTO filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "1") int size,
+            @RequestParam(defaultValue = "25") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction
     ) {
