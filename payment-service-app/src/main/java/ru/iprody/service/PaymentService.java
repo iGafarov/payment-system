@@ -3,7 +3,6 @@ package ru.iprody.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.iprody.model.PaymentFilterDTO;
 import ru.iprody.persistence.entity.Payment;
@@ -32,14 +31,12 @@ public class PaymentService {
     }
 
     public List<Payment> search(PaymentFilterDTO filter) {
-        Specification<Payment> spec =
-                PaymentSpecification.filterBy(filter);
+        final Specification<Payment> spec = PaymentSpecification.filterBy(filter);
         return paymentRepository.findAll(spec);
     }
 
     public Page<Payment> searchPaged(PaymentFilterDTO filter, Pageable pageable) {
-        Specification<Payment> spec =
-                PaymentSpecification.filterBy(filter);
+        final Specification<Payment> spec = PaymentSpecification.filterBy(filter);
         return paymentRepository.findAll(spec, pageable);
     }
 }

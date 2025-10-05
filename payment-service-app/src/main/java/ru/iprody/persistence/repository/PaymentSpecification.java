@@ -12,7 +12,7 @@ public class PaymentSpecification {
 
     public static Specification<Payment> filterBy(PaymentFilterDTO filter) {
         return ((root, query, builder) -> {
-            List<Predicate> predicates = new ArrayList<>();
+            final List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getGuid() != null) {
                 predicates.add(builder.equal(root.get("guid"), filter.getGuid()));
@@ -35,7 +35,11 @@ public class PaymentSpecification {
             }
 
             if (filter.getCreatedAfter() != null && filter.getCreatedBefore() != null) {
-                predicates.add(builder.between(root.get("createdAt"), filter.getCreatedAfter(), filter.getCreatedBefore()));
+                predicates.add(builder.between(
+                    root.get("createdAt"),
+                    filter.getCreatedAfter(),
+                    filter.getCreatedBefore())
+                );
             }
 
             return builder.and(predicates.toArray(new Predicate[0]));

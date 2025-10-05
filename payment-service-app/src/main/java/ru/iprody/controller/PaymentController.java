@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.iprody.model.PaymentFilterDTO;
 import ru.iprody.persistence.entity.Payment;
-import ru.iprody.persistence.repository.PaymentRepository;
-import ru.iprody.persistence.repository.PaymentSpecification;
 import ru.iprody.service.PaymentService;
 
 import java.util.List;
@@ -42,17 +40,17 @@ public class PaymentController {
 
     @GetMapping("/search")
     public Page<Payment> searchPayments(
-            @ModelAttribute PaymentFilterDTO filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "25") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
+        @ModelAttribute PaymentFilterDTO filter,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "25") int size,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "desc") String direction
     ) {
-        Sort sort = direction.equalsIgnoreCase("desc")
-                ? Sort.by(sortBy).descending()
-                : Sort.by(sortBy).ascending();
+        final Sort sort = direction.equalsIgnoreCase("desc")
+            ? Sort.by(sortBy).descending()
+            : Sort.by(sortBy).ascending();
 
-        Pageable pageable = PageRequest.of(page, size, sort);
+        final Pageable pageable = PageRequest.of(page, size, sort);
         return paymentService.searchPaged(filter, pageable);
     }
 }
