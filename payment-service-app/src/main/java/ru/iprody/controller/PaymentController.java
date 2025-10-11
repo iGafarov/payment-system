@@ -26,6 +26,11 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    private final static String PAGE_NUMBER = "0";
+    private final static String PAGE_SIZE = "25";
+    private final static String SORT_BY = "createdAt";
+    private final static String DIRECTION = "desc";
+
     @GetMapping
     public ResponseEntity<List<Payment>> getPayments() {
         return ResponseEntity.ok(paymentService.findAll());
@@ -41,10 +46,10 @@ public class PaymentController {
     @GetMapping("/search")
     public Page<Payment> searchPayments(
         @ModelAttribute PaymentFilterDTO filter,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "25") int size,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "desc") String direction
+        @RequestParam(defaultValue = PAGE_NUMBER) int page,
+        @RequestParam(defaultValue = PAGE_SIZE) int size,
+        @RequestParam(defaultValue = SORT_BY) String sortBy,
+        @RequestParam(defaultValue = DIRECTION) String direction
     ) {
         final Sort sort = direction.equalsIgnoreCase("desc")
             ? Sort.by(sortBy).descending()

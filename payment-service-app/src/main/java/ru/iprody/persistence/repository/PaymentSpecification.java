@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import ru.iprody.model.PaymentFilterDTO;
 import ru.iprody.persistence.entity.Payment;
+import ru.iprody.persistence.entity.Payment_;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,31 +15,31 @@ public class PaymentSpecification {
         return ((root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();
 
-            if (filter.getGuid() != null) {
-                predicates.add(builder.equal(root.get("guid"), filter.getGuid()));
+            if (filter.guid() != null) {
+                predicates.add(builder.equal(root.get(Payment_.guid), filter.guid()));
             }
 
-            if (filter.getPaymentStatus() != null) {
-                predicates.add(builder.equal(root.get("status"), filter.getPaymentStatus()));
+            if (filter.paymentStatus() != null) {
+                predicates.add(builder.equal(root.get(Payment_.status), filter.paymentStatus()));
             }
 
-            if (filter.getMinAmount() != null && filter.getMaxAmount() != null) {
-                predicates.add(builder.between(root.get("amount"), filter.getMinAmount(), filter.getMaxAmount()));
+            if (filter.minAmount() != null && filter.maxAmount() != null) {
+                predicates.add(builder.between(root.get(Payment_.amount), filter.minAmount(), filter.maxAmount()));
             }
 
-            if (filter.getMinAmount() != null) {
-                predicates.add(builder.gt(root.get("amount"), filter.getMinAmount()));
+            if (filter.minAmount() != null) {
+                predicates.add(builder.gt(root.get(Payment_.amount), filter.minAmount()));
             }
 
-            if (filter.getMaxAmount() != null) {
-                predicates.add(builder.lt(root.get("amount"), filter.getMaxAmount()));
+            if (filter.maxAmount() != null) {
+                predicates.add(builder.lt(root.get(Payment_.amount), filter.maxAmount()));
             }
 
-            if (filter.getCreatedAfter() != null && filter.getCreatedBefore() != null) {
+            if (filter.createdAfter() != null && filter.createdBefore() != null) {
                 predicates.add(builder.between(
-                    root.get("createdAt"),
-                    filter.getCreatedAfter(),
-                    filter.getCreatedBefore())
+                    root.get(Payment_.createdAt),
+                    filter.createdAfter(),
+                    filter.createdBefore())
                 );
             }
 
