@@ -1,40 +1,20 @@
 package ru.iprody.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import ru.iprody.model.PaymentFilterDTO;
-import ru.iprody.persistence.entity.Payment;
-import ru.iprody.persistence.repository.PaymentRepository;
-import ru.iprody.persistence.repository.PaymentSpecification;
+import ru.iprody.model.PaymentDto;
+import ru.iprody.model.PaymentFilter;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
-public class PaymentService {
+public interface PaymentService {
 
-    private final PaymentRepository paymentRepository;
+    PaymentDto findByPaymentId(UUID paymentId);
 
-    public Optional<Payment> findByPaymentId(UUID paymentId) {
-        return paymentRepository.findById(paymentId);
-    }
+    List<PaymentDto> findAll();
 
-    public List<Payment> findAll() {
-        return paymentRepository.findAll();
-    }
+    List<PaymentDto> search(PaymentFilter filter);
 
-    public List<Payment> search(PaymentFilterDTO filter) {
-        final Specification<Payment> spec = PaymentSpecification.filterBy(filter);
-        return paymentRepository.findAll(spec);
-    }
-
-    public Page<Payment> searchPaged(PaymentFilterDTO filter, Pageable pageable) {
-        final Specification<Payment> spec = PaymentSpecification.filterBy(filter);
-        return paymentRepository.findAll(spec, pageable);
-    }
+    Page<PaymentDto> searchPaged(PaymentFilter filter, Pageable pageable);
 }

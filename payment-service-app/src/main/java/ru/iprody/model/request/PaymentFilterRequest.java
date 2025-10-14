@@ -1,12 +1,14 @@
-package ru.iprody.model;
+package ru.iprody.model.request;
 
+import lombok.Builder;
 import ru.iprody.persistence.entity.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record PaymentFilterDTO (
+@Builder
+public record PaymentFilterRequest(
     UUID guid,
     BigDecimal minAmount,
     BigDecimal maxAmount,
