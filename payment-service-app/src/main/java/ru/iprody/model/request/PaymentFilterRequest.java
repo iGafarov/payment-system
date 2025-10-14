@@ -10,10 +10,13 @@ import java.util.UUID;
 @Builder
 public record PaymentFilterRequest(
     UUID guid,
-    BigDecimal minAmount,
-    BigDecimal maxAmount,
-    PaymentStatus paymentStatus,
-    LocalDateTime createdAfter,
-    LocalDateTime createdBefore
+    BigDecimal amount,
+    String currency,
+    PaymentStatus status,
+    UUID inquiryRefId,
+    UUID transactionRefId,
+    String note,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
 ) {
 }
