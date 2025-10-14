@@ -2,7 +2,7 @@ package ru.iprody.persistence.repository;
 
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import ru.iprody.model.request.PaymentFilterRequest;
+import ru.iprody.model.PaymentFilter;
 import ru.iprody.persistence.entity.Payment;
 import ru.iprody.persistence.entity.Payment_;
 
@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PaymentSpecification {
 
-    public static Specification<Payment> filterBy(PaymentFilterRequest filter) {
+    public static Specification<Payment> filterBy(PaymentFilter filter) {
         return ((root, query, builder) -> {
             final List<Predicate> predicates = new ArrayList<>();
 

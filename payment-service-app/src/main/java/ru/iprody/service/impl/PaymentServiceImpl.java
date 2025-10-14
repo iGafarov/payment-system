@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.iprody.mapper.PaymentMapper;
 import ru.iprody.model.PaymentDto;
-import ru.iprody.model.request.PaymentFilterRequest;
+import ru.iprody.model.PaymentFilter;
 import ru.iprody.persistence.entity.Payment;
 import ru.iprody.persistence.repository.PaymentRepository;
 import ru.iprody.persistence.repository.PaymentSpecification;
@@ -39,7 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentDto> search(PaymentFilterRequest filter) {
+    public List<PaymentDto> search(PaymentFilter filter) {
         final Specification<Payment> spec = PaymentSpecification.filterBy(filter);
         return paymentRepository.findAll(spec).stream()
                 .map(paymentMapper::toDto)
@@ -47,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<PaymentDto> searchPaged(PaymentFilterRequest filter, Pageable pageable) {
+    public Page<PaymentDto> searchPaged(PaymentFilter filter, Pageable pageable) {
         final Specification<Payment> spec = PaymentSpecification.filterBy(filter);
         return paymentRepository.findAll(spec, pageable)
                 .map(paymentMapper::toDto);

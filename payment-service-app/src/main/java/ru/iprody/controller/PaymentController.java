@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.iprody.mapper.PaymentFilterMapper;
 import ru.iprody.mapper.PaymentResponseMapper;
 import ru.iprody.model.PaymentDto;
 import ru.iprody.model.request.PaymentFilterRequest;
@@ -28,6 +29,7 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final PaymentResponseMapper responseMapper;
+    private final PaymentFilterMapper paymentFilterMapper;
 
     private final static String PAGE_NUMBER = "0";
     private final static String PAGE_SIZE = "25";
@@ -61,7 +63,7 @@ public class PaymentController {
             : Sort.by(sortBy).ascending();
 
         final Pageable pageable = PageRequest.of(page, size, sort);
-        return paymentService.searchPaged(filter, pageable)
+        return paymentService.searchPaged(paymentFilterMapper.toFilter(filter), pageable)
                 .map(responseMapper::toResponse);
     }
 }
